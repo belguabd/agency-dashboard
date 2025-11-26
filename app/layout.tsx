@@ -33,7 +33,6 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <Navbar />
           <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
             {children}
           </Providers>
