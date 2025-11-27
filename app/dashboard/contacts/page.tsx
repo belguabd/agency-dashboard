@@ -25,6 +25,8 @@ import {
     useDisclosure,
     Spinner,
     Skeleton,
+    Card,
+    CardBody,
 } from "@heroui/react";
 import { useUser } from '@clerk/nextjs';
 import { getContacts } from "@/app/actions/getContacts";
@@ -252,18 +254,16 @@ export default function ContactsPage() {
             return;
         }
 
-        // Increment view count and add to viewed contacts immediately
-        const newCount = dailyViewCount + 1;
         const newViewedContacts = new Set(viewedContacts).add(contact.id);
 
         // Update state immediately - this will remove skeleton from table
-        setDailyViewCount(newCount);
+        setDailyViewCount(prev => prev + 1);
         setViewedContacts(newViewedContacts);
 
         const today = new Date().toDateString();
         localStorage.setItem('contactViewData', JSON.stringify({
             date: today,
-            count: newCount,
+            count: dailyViewCount + 1,
             viewedIds: Array.from(newViewedContacts)
         }));
 
@@ -560,11 +560,11 @@ export default function ContactsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
-                        <Users className="w-8 h-8 text-blue-400" />
+                    <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+                        <Users className="w-8 h-8 text-success" />
                         Contacts
                     </h1>
-                    <p className="text-gray-400">
+                    <p className="text-default-500">
                         Browse and manage contact information for all agencies
                     </p>
                 </div>
@@ -572,31 +572,39 @@ export default function ContactsPage() {
 
             {/* Stats Summary */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Total Contacts</p>
-                    <p className="text-2xl font-bold text-white">{contacts.length}</p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Daily Views</p>
-                    <p className="text-2xl font-bold text-blue-400">
-                        {isPremium ? '∞' : dailyViewCount}
-                    </p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Views Remaining</p>
-                    <p className="text-2xl font-bold text-green-400">
-                        {isPremium ? '∞' : Math.max(0, DAILY_LIMIT - dailyViewCount)}
-                    </p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Current Plan</p>
-                    <div className="flex items-center gap-2">
-                        <p className="text-2xl font-bold text-white">
-                            {isPremium ? 'Premium' : 'Free'}
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">Total Contacts</p>
+                        <p className="text-2xl font-bold">{contacts.length}</p>
+                    </CardBody>
+                </Card>
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">Daily Views</p>
+                        <p className="text-2xl font-bold text-primary">
+                            {isPremium ? '∞' : dailyViewCount}
                         </p>
-                        {isPremium && <Crown className="w-5 h-5 text-yellow-400" />}
-                    </div>
-                </div>
+                    </CardBody>
+                </Card>
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">Views Remaining</p>
+                        <p className="text-2xl font-bold text-success">
+                            {isPremium ? '∞' : Math.max(0, DAILY_LIMIT - dailyViewCount)}
+                        </p>
+                    </CardBody>
+                </Card>
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">Current Plan</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-2xl font-bold">
+                                {isPremium ? 'Premium' : 'Free'}
+                            </p>
+                            {isPremium && <Crown className="w-5 h-5 text-warning" />}
+                        </div>
+                    </CardBody>
+                </Card>
             </div>
 
             {/* Table */}

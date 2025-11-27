@@ -18,6 +18,8 @@ import {
     Chip,
     Pagination,
     Spinner,
+    Card,
+    CardBody,
 } from "@heroui/react";
 
 import { getAgencies } from "@/app/actions/getAgencies";
@@ -381,11 +383,11 @@ export default function AgenciesPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
-                        <Building2 className="w-8 h-8 text-blue-400" />
+                    <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+                        <Building2 className="w-8 h-8 text-primary" />
                         Agencies
                     </h1>
-                    <p className="text-gray-400">
+                    <p className="text-default-500">
                         Browse and manage all agencies in the database
                     </p>
                 </div>
@@ -393,22 +395,28 @@ export default function AgenciesPage() {
 
             {/* Stats Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Total Agencies</p>
-                    <p className="text-2xl font-bold text-white">{agencies.length}</p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Total Population</p>
-                    <p className="text-2xl font-bold text-blue-400">
-                        {agencies.reduce((sum, a) => sum + (parseInt(a.population) || 0), 0).toLocaleString()}
-                    </p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">States Covered</p>
-                    <p className="text-2xl font-bold text-green-400">
-                        {new Set(agencies.map(a => a.state)).size}
-                    </p>
-                </div>
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">Total Agencies</p>
+                        <p className="text-2xl font-bold">{agencies.length}</p>
+                    </CardBody>
+                </Card>
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">Total Population</p>
+                        <p className="text-2xl font-bold text-primary">
+                            {agencies.reduce((sum, a) => sum + (parseInt(a.population) || 0), 0).toLocaleString()}
+                        </p>
+                    </CardBody>
+                </Card>
+                <Card shadow="sm">
+                    <CardBody>
+                        <p className="text-xs text-default-400 mb-1">States Covered</p>
+                        <p className="text-2xl font-bold text-success">
+                            {new Set(agencies.map(a => a.state)).size}
+                        </p>
+                    </CardBody>
+                </Card>
             </div>
 
             {/* Table */}
