@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Users, Crown } from "lucide-react";
 import {
     Table,
@@ -192,6 +192,7 @@ export default function ContactsPage() {
     const [isLoading, setIsLoading] = React.useState(true);
     const [viewedContacts, setViewedContacts] = React.useState<Set<string>>(new Set());
     const [isPremium, setIsPremium] = React.useState(false);
+    
 
     React.useEffect(() => {
         setIsMounted(true);
@@ -233,43 +234,49 @@ export default function ContactsPage() {
     }, []);
 
     const handleContactView = React.useCallback((contact: Contact) => {
-        // Always set the selected contact first
         setSelectedContact(contact);
 
-        // If premium, skip all limits
         if (isPremium) {
             onContactOpen();
             return;
         }
 
-        // Check if already viewed this contact
-        if (viewedContacts.has(contact.id)) {
+        const isViewed = viewedContacts.has(contact.id);
+        if (isViewed) {
             onContactOpen();
             return;
         }
 
-        // Check if limit reached BEFORE viewing
-        if (dailyViewCount >= DAILY_LIMIT) {
-            onOpen();
-            return;
-        }
+        setDailyViewCount(prevCount => {
+            if (prevCount >= DAILY_LIMIT) {
+                onOpen();
+                return prevCount; // ❌ do not update
+            }
 
-        const newViewedContacts = new Set(viewedContacts).add(contact.id);
+            const newCount = prevCount + 1;
 
-        // Update state immediately - this will remove skeleton from table
-        setDailyViewCount(prev => prev + 1);
-        setViewedContacts(newViewedContacts);
+            // update viewed ids + localStorage together
+            setViewedContacts(prevViewed => {
+                const updated = new Set(prevViewed);
+                updated.add(contact.id);
 
-        const today = new Date().toDateString();
-        localStorage.setItem('contactViewData', JSON.stringify({
-            date: today,
-            count: dailyViewCount + 1,
-            viewedIds: Array.from(newViewedContacts)
-        }));
+                localStorage.setItem('contactViewData', JSON.stringify({
+                    date: new Date().toDateString(),
+                    count: newCount,
+                    viewedIds: Array.from(updated),
+                }));
 
-        // Open contact details modal
-        onContactOpen();
-    }, [viewedContacts, dailyViewCount, onContactOpen, onOpen, isPremium]);
+                return updated;
+            });
+
+            onContactOpen();
+            return newCount;
+        });
+
+    }, [onContactOpen, onOpen, isPremium, viewedContacts]);
+
+
+
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -380,7 +387,7 @@ export default function ContactsPage() {
                         {capitalize(contact.department || "N/A")}
                     </Chip>
                 ) : (
-                    <Skeleton className="h-6 w-20 rounded-lg" />
+                    <Skeleton className="h-4 w-28 rounded-lg" />
                 );
             case "actions":
                 return (

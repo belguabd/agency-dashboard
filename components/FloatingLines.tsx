@@ -228,7 +228,7 @@ type FloatingLinesProps = {
   mixBlendMode?: React.CSSProperties['mixBlendMode'];
 };
 
-function hexToVec3(hex: string): Vector3 {
+function hexToVec3(hex: string): any {
   let value = hex.trim();
 
   if (value.startsWith('#')) {
@@ -382,7 +382,7 @@ export default function FloatingLines({
 
     const geometry = new PlaneGeometry(2, 2);
     const mesh = new Mesh(geometry, material);
-    scene.add(mesh);
+    (scene as any).add(mesh);
 
     const clock = new Clock();
 
@@ -393,8 +393,9 @@ export default function FloatingLines({
 
       renderer.setSize(width, height, false);
 
-      const canvasWidth = renderer.domElement.width;
-      const canvasHeight = renderer.domElement.height;
+      const canvas = renderer.domElement as HTMLCanvasElement;
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
       uniforms.iResolution.value.set(canvasWidth, canvasHeight, 1);
     };
 

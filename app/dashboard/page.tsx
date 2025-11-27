@@ -8,8 +8,11 @@ import React from "react";
 import { getAgencies } from "@/app/actions/getAgencies";
 import { getContacts } from "@/app/actions/getContacts";
 import { Card, CardBody, CardHeader, Button, Progress, Chip, Divider } from "@heroui/react";
+import { redirect } from "next/navigation";
 
 export default function DashboardPage() {
+
+    
     const { user } = useUser();
     const [totalAgencies, setTotalAgencies] = React.useState(0);
     const [totalContacts, setTotalContacts] = React.useState(0);
