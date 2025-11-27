@@ -17,39 +17,24 @@ import {
     DropdownItem,
     Chip,
     Pagination,
+    Spinner,
 } from "@heroui/react";
+
+import { getAgencies } from "@/app/actions/getAgencies";
+import { Agency } from "@/types/agency";
 
 // Table columns configuration
 const columns = [
-    { name: "ID", uid: "id", sortable: true },
     { name: "AGENCY NAME", uid: "name", sortable: true },
-    { name: "LOCATION", uid: "location", sortable: true },
-    { name: "INDUSTRY", uid: "industry", sortable: true },
-    { name: "EMPLOYEES", uid: "employees", sortable: true },
-    { name: "STATUS", uid: "status", sortable: true },
+    { name: "STATE", uid: "state", sortable: true },
+    { name: "STATE CODE", uid: "state_code", sortable: true },
+    { name: "TYPE", uid: "type", sortable: true },
+    { name: "POPULATION", uid: "population", sortable: true },
 ];
 
 const statusOptions = [
     { name: "Active", uid: "active" },
     { name: "Inactive", uid: "inactive" },
-];
-
-const agencies = [
-    { id: 1, name: "TechCorp Solutions", location: "New York, NY", employees: 250, status: "active", industry: "Technology" },
-    { id: 2, name: "Global Consulting Inc", location: "London, UK", employees: 180, status: "active", industry: "Consulting" },
-    { id: 3, name: "Design Studios Ltd", location: "San Francisco, CA", employees: 95, status: "active", industry: "Design" },
-    { id: 4, name: "Marketing Pros", location: "Chicago, IL", employees: 120, status: "active", industry: "Marketing" },
-    { id: 5, name: "Finance Experts", location: "Boston, MA", employees: 300, status: "inactive", industry: "Finance" },
-    { id: 6, name: "Healthcare Solutions", location: "Austin, TX", employees: 450, status: "active", industry: "Healthcare" },
-    { id: 7, name: "Legal Partners", location: "Washington, DC", employees: 85, status: "active", industry: "Legal" },
-    { id: 8, name: "Retail Giants", location: "Los Angeles, CA", employees: 520, status: "active", industry: "Retail" },
-    { id: 9, name: "Education First", location: "Seattle, WA", employees: 210, status: "inactive", industry: "Education" },
-    { id: 10, name: "Manufacturing Co", location: "Detroit, MI", employees: 380, status: "active", industry: "Manufacturing" },
-    { id: 11, name: "Tech Innovators", location: "San Jose, CA", employees: 175, status: "active", industry: "Technology" },
-    { id: 12, name: "Strategy Partners", location: "Boston, MA", employees: 140, status: "active", industry: "Consulting" },
-    { id: 13, name: "Creative Agency", location: "Portland, OR", employees: 65, status: "inactive", industry: "Design" },
-    { id: 14, name: "Digital Marketing Co", location: "Miami, FL", employees: 95, status: "active", industry: "Marketing" },
-    { id: 15, name: "Investment Group", location: "New York, NY", employees: 420, status: "active", industry: "Finance" },
 ];
 
 function capitalize(s: string) {
@@ -136,29 +121,48 @@ const ChevronDownIcon = ({ strokeWidth = 1.5, ...otherProps }: any) => {
     );
 };
 
-const statusColorMap: Record<string, "success" | "default"> = {
-    active: "success",
-    inactive: "default",
-};
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "location", "industry", "employees", "status"];
+
+const INITIAL_VISIBLE_COLUMNS = ["name", "state", "state_code", "type", "population"];
 
 export default function AgenciesPage() {
+
+    const [agencies, setAgencies] = React.useState<Agency[]>([]);
+    const [loading, setLoading] = React.useState(true);
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState<any>(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState<any>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = React.useState<any>("all");
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
     const [sortDescriptor, setSortDescriptor] = React.useState<any>({
         column: "name",
         direction: "ascending",
     });
+
+
     const [page, setPage] = React.useState(1);
     const [isMounted, setIsMounted] = React.useState(false);
 
     React.useEffect(() => {
         setIsMounted(true);
+        fetchAgencies();
     }, []);
+
+    const fetchAgencies = async () => {
+        try {
+            setLoading(true);
+            const data = await getAgencies();
+
+            // Ensure data is an array
+            setAgencies(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Failed to fetch agencies:", error);
+            setAgencies([]); // Set empty array on error
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -183,7 +187,7 @@ export default function AgenciesPage() {
         }
 
         return filteredAgencies;
-    }, [filterValue, statusFilter]);
+    }, [agencies, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage) || 1;
 
@@ -204,12 +208,10 @@ export default function AgenciesPage() {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = React.useCallback((agency: any, columnKey: React.Key) => {
-        const cellValue = agency[columnKey as keyof typeof agency];
+    const renderCell = React.useCallback((agency: Agency, columnKey: React.Key) => {
+        const cellValue = agency[columnKey as keyof Agency];
 
         switch (columnKey) {
-            case "id":
-                return <span className="text-default-400">#{cellValue}</span>;
             case "name":
                 return (
                     <div className="flex items-center gap-3">
@@ -218,23 +220,24 @@ export default function AgenciesPage() {
                         </div>
                         <div className="flex flex-col">
                             <p className="text-bold text-small">{cellValue}</p>
+                            <p className="text-tiny text-default-400">{agency.county}</p>
                         </div>
                     </div>
                 );
-            case "industry":
+            case "type":
                 return (
                     <Chip className="capitalize" size="sm" variant="flat">
                         {cellValue}
                     </Chip>
                 );
-            case "status":
+            case "population":
                 return (
-                    <Chip className="capitalize" color={statusColorMap[agency.status]} size="sm" variant="flat">
-                        {cellValue}
-                    </Chip>
+                    <span className="text-bold text-small">
+                        {cellValue ? parseInt(cellValue).toLocaleString() : "N/A"}
+                    </span>
                 );
             default:
-                return cellValue;
+                return cellValue || "N/A";
         }
     }, []);
 
@@ -286,27 +289,6 @@ export default function AgenciesPage() {
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                                    Status
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                disallowEmptySelection
-                                aria-label="Table Columns"
-                                closeOnSelect={false}
-                                selectedKeys={statusFilter}
-                                selectionMode="multiple"
-                                onSelectionChange={setStatusFilter}
-                            >
-                                {statusOptions.map((status) => (
-                                    <DropdownItem key={status.uid} className="capitalize">
-                                        {capitalize(status.name)}
-                                    </DropdownItem>
-                                ))}
-                            </DropdownMenu>
-                        </Dropdown>
-                        <Dropdown>
-                            <DropdownTrigger className="hidden sm:flex">
-                                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                                     Columns
                                 </Button>
                             </DropdownTrigger>
@@ -348,8 +330,8 @@ export default function AgenciesPage() {
         );
     }, [
         filterValue,
-        statusFilter,
         visibleColumns,
+        agencies.length,
         onRowsPerPageChange,
         onSearchChange,
         hasSearchFilter,
@@ -384,6 +366,14 @@ export default function AgenciesPage() {
         );
     }, [selectedKeys, filteredItems.length, page, pages, hasSearchFilter]);
 
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[400px]">
+                <Spinner size="lg" />
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -400,27 +390,21 @@ export default function AgenciesPage() {
             </div>
 
             {/* Stats Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <p className="text-xs text-gray-400 mb-1">Total Agencies</p>
                     <p className="text-2xl font-bold text-white">{agencies.length}</p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Active</p>
+                    <p className="text-xs text-gray-400 mb-1">Total Population</p>
+                    <p className="text-2xl font-bold text-blue-400">
+                        {agencies.reduce((sum, a) => sum + (parseInt(a.population) || 0), 0).toLocaleString()}
+                    </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p className="text-xs text-gray-400 mb-1">States Covered</p>
                     <p className="text-2xl font-bold text-green-400">
-                        {agencies.filter(a => a.status === "active").length}
-                    </p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Inactive</p>
-                    <p className="text-2xl font-bold text-gray-400">
-                        {agencies.filter(a => a.status === "inactive").length}
-                    </p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Total Employees</p>
-                    <p className="text-2xl font-bold text-white">
-                        {agencies.reduce((sum, a) => sum + a.employees, 0).toLocaleString()}
+                        {new Set(agencies.map(a => a.state)).size}
                     </p>
                 </div>
             </div>

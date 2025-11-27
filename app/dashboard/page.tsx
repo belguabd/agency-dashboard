@@ -19,7 +19,7 @@ export default function DashboardPage() {
 
     const progressPercentage = (stats.contactsViewedToday / stats.dailyLimit) * 100;
 
-   
+    
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -40,7 +40,7 @@ export default function DashboardPage() {
                         <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
                             <Building2 className="w-6 h-6 text-blue-400" />
                         </div>
-                        <Link href="/agencies">
+                        <Link href="/dashboard/agencies">
                             <button className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
                                 View All →
                             </button>
@@ -58,7 +58,7 @@ export default function DashboardPage() {
                         <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
                             <Users className="w-6 h-6 text-green-400" />
                         </div>
-                        <Link href="/contacts">
+                        <Link href="/dashboard/contacts">
                             <button className="text-xs text-green-400 hover:text-green-300 transition-colors">
                                 View All →
                             </button>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
             <div>
                 <h2 className="text-xl font-bold text-white mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Link href="/agencies">
+                    <Link href="/dashboard/agencies">
                         <div className="group bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/[0.07] hover:border-white/20 transition-all duration-200 cursor-pointer">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
@@ -138,7 +138,7 @@ export default function DashboardPage() {
                         </div>
                     </Link>
 
-                    <Link href="/contacts">
+                    <Link href="/dashboard/contacts">
                         <div className="group bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/[0.07] hover:border-white/20 transition-all duration-200 cursor-pointer">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center group-hover:bg-green-500/20 transition-colors">

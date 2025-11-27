@@ -23,8 +23,8 @@ export default function Sidebar() {
 
     const navItems = [
         { href: "/dashboard", label: "Dashboard", icon: Home, color: "purple" },
-        { href: "/agencies", label: "Agencies", icon: Building2, color: "blue" },
-        { href: "/contacts", label: "Employees", icon: Users, color: "green" },
+        { href: "/dashboard/agencies", label: "Agencies", icon: Building2, color: "blue" },
+        { href: "/dashboard/contacts", label: "Employees", icon: Users, color: "green" },
     ];
 
     return (
@@ -103,7 +103,7 @@ export default function Sidebar() {
                                 </p>
                             </div>
                         </div>
-                        <Link href="/upgrade" className="relative">
+                        <Link href="/dashboard/upgrade" className="relative">
                             <button className="w-full px-4 py-2.5 bg-white text-black rounded-lg text-xs font-bold hover:bg-gray-100 active:scale-98 transition-all duration-200 shadow-md hover:shadow-lg">
                                 Upgrade Now
                             </button>
