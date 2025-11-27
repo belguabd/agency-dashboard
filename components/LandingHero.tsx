@@ -53,7 +53,7 @@ export default function HeroSection() {
                         {/* Get Started Button */}
                         <SignedOut>
                             <SignInButton mode="modal">
-                                <button className="group px-6 py-2.5 text-sm font-medium text-white bg-white/10 hover:bg-white/15 border border-white/20 rounded-lg transition-colors duration-200">
+                                <button className="group px-6 py-3 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
                                     Get Started
                                     <ArrowRight className="inline-block w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                                 </button>
@@ -62,8 +62,8 @@ export default function HeroSection() {
 
                         <SignedIn>
                             <Link href="/dashboard">
-                                <button className="group px-6 py-2.5 text-sm font-medium text-white bg-white/10 hover:bg-white/15 border border-white/20 rounded-lg transition-colors duration-200">
-                                    Get Started
+                                <button className="group px-6 py-3 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 shadow-lg hover:shadow-blue-500/25">
+                                    Go to Dashboard
                                     <ArrowRight className="inline-block w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                                 </button>
                             </Link>
@@ -74,7 +74,7 @@ export default function HeroSection() {
                                 const section = document.getElementById("features");
                                 section?.scrollIntoView({ behavior: "smooth" });
                             }}
-                            className="px-6 py-2.5 text-sm font-medium text-gray-400 hover:text-white border border-white/10 hover:border-white/20 rounded-lg transition-colors duration-200"
+                            className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 rounded-lg transition-all duration-200"
                         >
                             Learn More
                         </button>

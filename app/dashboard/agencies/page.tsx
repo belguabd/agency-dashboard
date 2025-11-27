@@ -21,7 +21,7 @@ import {
 } from "@heroui/react";
 
 import { getAgencies } from "@/app/actions/getAgencies";
-import { Agency } from "@/types/agency";
+import { Agency } from "@/types";
 
 // Table columns configuration
 const columns = [
@@ -40,32 +40,6 @@ const statusOptions = [
 function capitalize(s: string) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
 }
-
-const PlusIcon = ({ size = 24, width, height, ...props }: any) => {
-    return (
-        <svg
-            aria-hidden="true"
-            fill="none"
-            focusable="false"
-            height={size || height}
-            role="presentation"
-            viewBox="0 0 24 24"
-            width={size || width}
-            {...props}
-        >
-            <g
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-            >
-                <path d="M6 12h12" />
-                <path d="M12 18V6" />
-            </g>
-        </svg>
-    );
-};
 
 const SearchIcon = (props: any) => {
     return (
@@ -121,6 +95,28 @@ const ChevronDownIcon = ({ strokeWidth = 1.5, ...otherProps }: any) => {
     );
 };
 
+const RefreshIcon = (props: any) => {
+    return (
+        <svg
+            aria-hidden="true"
+            fill="none"
+            focusable="false"
+            height="1em"
+            role="presentation"
+            viewBox="0 0 24 24"
+            width="1em"
+            {...props}
+        >
+            <path
+                d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+            />
+        </svg>
+    );
+};
 
 
 const INITIAL_VISIBLE_COLUMNS = ["name", "state", "state_code", "type", "population"];
@@ -307,8 +303,14 @@ export default function AgenciesPage() {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button color="primary" endContent={<PlusIcon />}>
-                            Add New
+                        <Button
+                            color="primary"
+                            variant="flat"
+                            startContent={<RefreshIcon />}
+                            onPress={fetchAgencies}
+                            isLoading={loading}
+                        >
+                            Refresh
                         </Button>
                     </div>
                 </div>

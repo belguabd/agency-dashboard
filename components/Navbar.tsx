@@ -5,7 +5,7 @@ import {
     SignedIn,
     SignedOut,
     UserButton,
-    
+
 } from '@clerk/nextjs'
 import { Building2 } from 'lucide-react';
 
@@ -16,21 +16,26 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-16">
 
                     {/* Logo */}
-                    <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-white" />
-                        <span className="text-sm font-medium text-white">AgencyHub</span>
+                    <div className="flex items-center gap-3">
+                        <div className="relative w-9 h-9 rounded-xl bg-linear-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center shadow-lg shadow-white/5">
+                            <span className="text-white font-bold text-lg">A</span>
+                        </div>
+                        <div>
+                            <h1 className="text-white font-bold text-sm">Agency</h1>
+                            <p className="text-xs text-gray-500">Dashboard</p>
+                        </div>
                     </div>
 
                     {/* Auth Buttons */}
                     <div className="flex items-center gap-2">
                         <SignedOut>
-                            <SignInButton mode="modal">
+                            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                                 <button className="px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white border border-white/10 rounded-md transition-colors">
                                     Sign In
                                 </button>
                             </SignInButton>
 
-                            <SignUpButton mode="modal">
+                            <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                                 <button className="px-3 py-1.5 text-xs font-medium text-white bg-white/10 hover:bg-white/15 border border-white/10 rounded-md transition-colors">
                                     Sign Up
                                 </button>

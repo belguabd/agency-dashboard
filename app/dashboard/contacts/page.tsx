@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Users } from "lucide-react";
+import { Users, Crown } from "lucide-react";
 import {
     Table,
     TableHeader,
@@ -23,8 +23,12 @@ import {
     ModalBody,
     ModalFooter,
     useDisclosure,
+    Spinner,
+    Skeleton,
 } from "@heroui/react";
 import { useUser } from '@clerk/nextjs';
+import { getContacts } from "@/app/actions/getContacts";
+import { Contact } from "@/types";
 
 // Table columns configuration
 const columns = [
@@ -33,7 +37,6 @@ const columns = [
     { name: "EMAIL", uid: "email", sortable: true },
     { name: "PHONE", uid: "phone", sortable: false },
     { name: "POSITION", uid: "position", sortable: true },
-    { name: "AGENCY", uid: "agency", sortable: true },
     { name: "DEPARTMENT", uid: "department", sortable: true },
     { name: "ACTIONS", uid: "actions", sortable: false },
 ];
@@ -45,35 +48,6 @@ const departmentOptions = [
     { name: "HR", uid: "hr" },
     { name: "IT", uid: "it" },
     { name: "Sales", uid: "sales" },
-];
-
-const contacts = [
-    { id: 1, firstName: 'John', lastName: 'Smith', email: 'j.smith@nyc.gov', phone: '(212) 555-0101', position: 'Manager', agency: 'New York', department: 'operations' },
-    { id: 2, firstName: 'Sarah', lastName: 'Johnson', email: 's.johnson@la.gov', phone: '(213) 555-0102', position: 'Director', agency: 'Los Angeles', department: 'marketing' },
-    { id: 3, firstName: 'Michael', lastName: 'Brown', email: 'm.brown@chicago.gov', phone: '(312) 555-0103', position: 'Analyst', agency: 'Chicago', department: 'finance' },
-    { id: 4, firstName: 'Emily', lastName: 'Davis', email: 'e.davis@houston.gov', phone: '(713) 555-0104', position: 'Coordinator', agency: 'Houston', department: 'hr' },
-    { id: 5, firstName: 'David', lastName: 'Wilson', email: 'd.wilson@phoenix.gov', phone: '(602) 555-0105', position: 'Specialist', agency: 'Phoenix', department: 'it' },
-    { id: 6, firstName: 'Jessica', lastName: 'Miller', email: 'j.miller@philly.gov', phone: '(215) 555-0106', position: 'Lead', agency: 'Philadelphia', department: 'operations' },
-    { id: 7, firstName: 'Chris', lastName: 'Anderson', email: 'c.anderson@sa.gov', phone: '(210) 555-0107', position: 'Manager', agency: 'San Antonio', department: 'sales' },
-    { id: 8, firstName: 'Amanda', lastName: 'Taylor', email: 'a.taylor@sd.gov', phone: '(619) 555-0108', position: 'Director', agency: 'San Diego', department: 'marketing' },
-    { id: 9, firstName: 'Ryan', lastName: 'Thomas', email: 'r.thomas@dallas.gov', phone: '(214) 555-0109', position: 'Analyst', agency: 'Dallas', department: 'finance' },
-    { id: 10, firstName: 'Lisa', lastName: 'Jackson', email: 'l.jackson@sj.gov', phone: '(408) 555-0110', position: 'Coordinator', agency: 'San Jose', department: 'hr' },
-    { id: 11, firstName: 'Kevin', lastName: 'White', email: 'k.white@austin.gov', phone: '(512) 555-0111', position: 'Specialist', agency: 'Austin', department: 'it' },
-    { id: 12, firstName: 'Nicole', lastName: 'Harris', email: 'n.harris@jax.gov', phone: '(904) 555-0112', position: 'Lead', agency: 'Jacksonville', department: 'operations' },
-    { id: 13, firstName: 'Brandon', lastName: 'Martin', email: 'b.martin@sf.gov', phone: '(415) 555-0113', position: 'Manager', agency: 'San Francisco', department: 'sales' },
-    { id: 14, firstName: 'Rachel', lastName: 'Thompson', email: 'r.thompson@columbus.gov', phone: '(614) 555-0114', position: 'Director', agency: 'Columbus', department: 'marketing' },
-    { id: 15, firstName: 'Jason', lastName: 'Garcia', email: 'j.garcia@indy.gov', phone: '(317) 555-0115', position: 'Analyst', agency: 'Indianapolis', department: 'finance' },
-    { id: 16, firstName: 'Stephanie', lastName: 'Martinez', email: 's.martinez@charlotte.gov', phone: '(704) 555-0116', position: 'Coordinator', agency: 'Charlotte', department: 'hr' },
-    { id: 17, firstName: 'Mark', lastName: 'Robinson', email: 'm.robinson@seattle.gov', phone: '(206) 555-0117', position: 'Specialist', agency: 'Seattle', department: 'it' },
-    { id: 18, firstName: 'Ashley', lastName: 'Clark', email: 'a.clark@denver.gov', phone: '(303) 555-0118', position: 'Lead', agency: 'Denver', department: 'operations' },
-    { id: 19, firstName: 'Daniel', lastName: 'Rodriguez', email: 'd.rodriguez@dc.gov', phone: '(202) 555-0119', position: 'Manager', agency: 'Washington', department: 'sales' },
-    { id: 20, firstName: 'Michelle', lastName: 'Lewis', email: 'm.lewis@boston.gov', phone: '(617) 555-0120', position: 'Director', agency: 'Boston', department: 'marketing' },
-    { id: 21, firstName: 'Andrew', lastName: 'Lee', email: 'a.lee@nashville.gov', phone: '(615) 555-0121', position: 'Analyst', agency: 'Nashville', department: 'finance' },
-    { id: 22, firstName: 'Samantha', lastName: 'Walker', email: 's.walker@baltimore.gov', phone: '(410) 555-0122', position: 'Coordinator', agency: 'Baltimore', department: 'hr' },
-    { id: 23, firstName: 'Tyler', lastName: 'Hall', email: 't.hall@louisville.gov', phone: '(502) 555-0123', position: 'Specialist', agency: 'Louisville', department: 'it' },
-    { id: 24, firstName: 'Megan', lastName: 'Allen', email: 'm.allen@portland.gov', phone: '(503) 555-0124', position: 'Lead', agency: 'Portland', department: 'operations' },
-    { id: 25, firstName: 'Jonathan', lastName: 'Young', email: 'j.young@okc.gov', phone: '(405) 555-0125', position: 'Manager', agency: 'Oklahoma City', department: 'sales' },
-    { id: 26, firstName: 'Laura', lastName: 'King', email: 'l.king@milwaukee.gov', phone: '(414) 555-0126', position: 'Director', agency: 'Milwaukee', department: 'marketing' }
 ];
 
 function capitalize(s: string) {
@@ -162,6 +136,27 @@ const EyeIcon = (props: any) => (
     </svg>
 );
 
+const LockIcon = (props: any) => (
+    <svg
+        aria-hidden="true"
+        fill="none"
+        focusable="false"
+        height="1em"
+        role="presentation"
+        viewBox="0 0 24 24"
+        width="1em"
+        {...props}
+    >
+        <path
+            d="M12 14.5V16.5M7 10.0288C7.47142 10 8.05259 10 8.8 10H15.2C15.9474 10 16.5286 10 17 10.0288M7 10.0288C6.41168 10.0647 5.99429 10.1455 5.63803 10.327C5.07354 10.6146 4.6146 11.0735 4.32698 11.638C4 12.2798 4 13.1198 4 14.8V16.2C4 17.8802 4 18.7202 4.32698 19.362C4.6146 19.9265 5.07354 20.3854 5.63803 20.673C6.27976 21 7.11984 21 8.8 21H15.2C16.8802 21 17.7202 21 18.362 20.673C18.9265 20.3854 19.3854 19.9265 19.673 19.362C20 18.7202 20 17.8802 20 16.2V14.8C20 13.1198 20 12.2798 19.673 11.638C19.3854 11.0735 18.9265 10.6146 18.362 10.327C18.0057 10.1455 17.5883 10.0647 17 10.0288M7 10.0288V8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8V10.0288"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+        />
+    </svg>
+);
+
 const departmentColorMap: Record<string, "primary" | "secondary" | "success" | "warning" | "danger" | "default"> = {
     operations: "primary",
     marketing: "secondary",
@@ -171,12 +166,13 @@ const departmentColorMap: Record<string, "primary" | "secondary" | "success" | "
     sales: "default",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "email", "phone", "position", "agency", "department", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["name", "email", "phone", "position", "department", "actions"];
 const DAILY_LIMIT = 50;
 
 export default function ContactsPage() {
     const { user } = useUser();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isContactOpen, onOpen: onContactOpen, onOpenChange: onContactOpenChange } = useDisclosure();
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState<any>(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState<any>(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -189,7 +185,11 @@ export default function ContactsPage() {
     const [page, setPage] = React.useState(1);
     const [isMounted, setIsMounted] = React.useState(false);
     const [dailyViewCount, setDailyViewCount] = React.useState(0);
-    const [selectedContact, setSelectedContact] = React.useState<any>(null);
+    const [selectedContact, setSelectedContact] = React.useState<Contact | null>(null);
+    const [contacts, setContacts] = React.useState<Contact[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [viewedContacts, setViewedContacts] = React.useState<Set<string>>(new Set());
+    const [isPremium, setIsPremium] = React.useState(false);
 
     React.useEffect(() => {
         setIsMounted(true);
@@ -197,38 +197,79 @@ export default function ContactsPage() {
         const today = new Date().toDateString();
         const storedData = localStorage.getItem('contactViewData');
 
+        // Check premium status
+        const premiumStatus = localStorage.getItem('premiumStatus');
+        if (premiumStatus) {
+            const { isPremium: premium } = JSON.parse(premiumStatus);
+            setIsPremium(premium);
+        }
+
         if (storedData) {
-            const { date, count } = JSON.parse(storedData);
+            const { date, count, viewedIds } = JSON.parse(storedData);
             if (date === today) {
                 setDailyViewCount(count);
+                setViewedContacts(new Set(viewedIds || []));
             } else {
                 // New day, reset count
                 setDailyViewCount(0);
-                localStorage.setItem('contactViewData', JSON.stringify({ date: today, count: 0 }));
+                setViewedContacts(new Set());
+                localStorage.setItem('contactViewData', JSON.stringify({ date: today, count: 0, viewedIds: [] }));
             }
         } else {
-            localStorage.setItem('contactViewData', JSON.stringify({ date: today, count: 0 }));
+            localStorage.setItem('contactViewData', JSON.stringify({ date: today, count: 0, viewedIds: [] }));
         }
+
+        // Fetch contacts data
+        const fetchContacts = async () => {
+            setIsLoading(true);
+            const data = await getContacts();
+            setContacts(data);
+            setIsLoading(false);
+        };
+
+        fetchContacts();
     }, []);
 
-    const handleContactView = (contact: any) => {
+    const handleContactView = React.useCallback((contact: Contact) => {
+        // Always set the selected contact first
+        setSelectedContact(contact);
+
+        // If premium, skip all limits
+        if (isPremium) {
+            onContactOpen();
+            return;
+        }
+
+        // Check if already viewed this contact
+        if (viewedContacts.has(contact.id)) {
+            onContactOpen();
+            return;
+        }
+
+        // Check if limit reached BEFORE viewing
         if (dailyViewCount >= DAILY_LIMIT) {
             onOpen();
             return;
         }
 
+        // Increment view count and add to viewed contacts immediately
         const newCount = dailyViewCount + 1;
+        const newViewedContacts = new Set(viewedContacts).add(contact.id);
+
+        // Update state immediately - this will remove skeleton from table
         setDailyViewCount(newCount);
+        setViewedContacts(newViewedContacts);
 
         const today = new Date().toDateString();
-        localStorage.setItem('contactViewData', JSON.stringify({ date: today, count: newCount }));
+        localStorage.setItem('contactViewData', JSON.stringify({
+            date: today,
+            count: newCount,
+            viewedIds: Array.from(newViewedContacts)
+        }));
 
-        setSelectedContact(contact);
-
-        if (newCount >= DAILY_LIMIT) {
-            setTimeout(() => onOpen(), 100);
-        }
-    };
+        // Open contact details modal
+        onContactOpen();
+    }, [viewedContacts, dailyViewCount, onContactOpen, onOpen, isPremium]);
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -242,20 +283,19 @@ export default function ContactsPage() {
 
         if (hasSearchFilter) {
             filteredContacts = filteredContacts.filter((contact) =>
-                `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(filterValue.toLowerCase()) ||
+                `${contact.first_name} ${contact.last_name}`.toLowerCase().includes(filterValue.toLowerCase()) ||
                 contact.email.toLowerCase().includes(filterValue.toLowerCase()) ||
-                contact.agency.toLowerCase().includes(filterValue.toLowerCase()) ||
-                contact.position.toLowerCase().includes(filterValue.toLowerCase())
+                contact.title.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
         if (departmentFilter !== "all" && Array.from(departmentFilter).length !== departmentOptions.length) {
             filteredContacts = filteredContacts.filter((contact) =>
-                Array.from(departmentFilter).includes(contact.department),
+                Array.from(departmentFilter).includes(contact.department.toLowerCase()),
             );
         }
 
         return filteredContacts;
-    }, [filterValue, departmentFilter]);
+    }, [contacts, filterValue, departmentFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage) || 1;
 
@@ -270,8 +310,11 @@ export default function ContactsPage() {
             let first, second;
 
             if (sortDescriptor.column === 'name') {
-                first = `${a.firstName} ${a.lastName}`;
-                second = `${b.firstName} ${b.lastName}`;
+                first = `${a.first_name} ${a.last_name}`;
+                second = `${b.first_name} ${b.last_name}`;
+            } else if (sortDescriptor.column === 'position') {
+                first = a.title;
+                second = b.title;
             } else {
                 first = a[sortDescriptor.column];
                 second = b[sortDescriptor.column];
@@ -282,12 +325,15 @@ export default function ContactsPage() {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = React.useCallback((contact: any, columnKey: React.Key) => {
-        const cellValue = contact[columnKey as keyof typeof contact];
+    const renderCell = React.useCallback((contact: Contact, columnKey: React.Key) => {
+        const cellValue = contact[columnKey as keyof Contact];
+        // Premium users can always view contacts
+        const isViewed = isPremium || viewedContacts.has(contact.id);
+        const canView = isPremium || isViewed || dailyViewCount < DAILY_LIMIT;
 
         switch (columnKey) {
             case "id":
-                return <span className="text-default-400">#{cellValue}</span>;
+                return <span className="text-default-400">#{contact.id.substring(0, 8)}</span>;
             case "name":
                 return (
                     <div className="flex items-center gap-3">
@@ -295,20 +341,46 @@ export default function ContactsPage() {
                             <Users className="w-5 h-5 text-blue-400" />
                         </div>
                         <div className="flex flex-col">
-                            <p className="text-bold text-small">{contact.firstName} {contact.lastName}</p>
+                            {isViewed ? (
+                                <p className="text-bold text-small">
+                                    {contact.first_name} {contact.last_name}
+                                </p>
+                            ) : (
+                                <Skeleton className="h-4 w-32 rounded-lg" />
+                            )}
                         </div>
                     </div>
                 );
+            case "email":
+                return isViewed ? (
+                    contact.email
+                ) : (
+                    <Skeleton className="h-4 w-48 rounded-lg" />
+                );
+            case "phone":
+                return isViewed ? (
+                    contact.phone
+                ) : (
+                    <Skeleton className="h-4 w-32 rounded-lg" />
+                );
+            case "position":
+                return isViewed ? (
+                    contact.title
+                ) : (
+                    <Skeleton className="h-4 w-28 rounded-lg" />
+                );
             case "department":
-                return (
+                return isViewed ? (
                     <Chip
                         className="capitalize"
-                        color={departmentColorMap[contact.department]}
+                        color={departmentColorMap[contact.department?.toLowerCase()] || "default"}
                         size="sm"
                         variant="flat"
                     >
-                        {capitalize(cellValue)}
+                        {capitalize(contact.department || "N/A")}
                     </Chip>
+                ) : (
+                    <Skeleton className="h-6 w-20 rounded-lg" />
                 );
             case "actions":
                 return (
@@ -316,15 +388,16 @@ export default function ContactsPage() {
                         isIconOnly
                         size="sm"
                         variant="light"
+                        color={canView ? "default" : "warning"}
                         onPress={() => handleContactView(contact)}
                     >
-                        <EyeIcon />
+                        {canView ? <EyeIcon /> : <LockIcon />}
                     </Button>
                 );
             default:
                 return cellValue;
         }
-    }, []);
+    }, [viewedContacts, dailyViewCount, handleContactView, isPremium]);
 
     // ...existing pagination and search handlers from agencies page...
     const onNextPage = React.useCallback(() => {
@@ -418,7 +491,7 @@ export default function ContactsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-default-400 text-small">
-                        Total {contacts.length} contacts | Daily views: {dailyViewCount}/{DAILY_LIMIT}
+                        Total {contacts.length} contacts | Daily views: {isPremium ? '∞ Unlimited' : `${dailyViewCount}/${DAILY_LIMIT}`}
                     </span>
                     <label className="flex items-center text-default-400 text-small">
                         Rows per page:
@@ -442,6 +515,7 @@ export default function ContactsPage() {
         onSearchChange,
         hasSearchFilter,
         dailyViewCount,
+        isPremium,
     ]);
 
     const bottomContent = React.useMemo(() => {
@@ -473,6 +547,14 @@ export default function ContactsPage() {
         );
     }, [selectedKeys, filteredItems.length, page, pages, hasSearchFilter]);
 
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-[400px]">
+                <Spinner size="lg" />
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -496,17 +578,24 @@ export default function ContactsPage() {
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <p className="text-xs text-gray-400 mb-1">Daily Views</p>
-                    <p className="text-2xl font-bold text-blue-400">{dailyViewCount}</p>
+                    <p className="text-2xl font-bold text-blue-400">
+                        {isPremium ? '∞' : dailyViewCount}
+                    </p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <p className="text-xs text-gray-400 mb-1">Views Remaining</p>
-                    <p className="text-2xl font-bold text-green-400">{Math.max(0, DAILY_LIMIT - dailyViewCount)}</p>
+                    <p className="text-2xl font-bold text-green-400">
+                        {isPremium ? '∞' : Math.max(0, DAILY_LIMIT - dailyViewCount)}
+                    </p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-xs text-gray-400 mb-1">Unique Agencies</p>
-                    <p className="text-2xl font-bold text-white">
-                        {new Set(contacts.map(c => c.agency)).size}
-                    </p>
+                    <p className="text-xs text-gray-400 mb-1">Current Plan</p>
+                    <div className="flex items-center gap-2">
+                        <p className="text-2xl font-bold text-white">
+                            {isPremium ? 'Premium' : 'Free'}
+                        </p>
+                        {isPremium && <Crown className="w-5 h-5 text-yellow-400" />}
+                    </div>
                 </div>
             </div>
 
@@ -550,40 +639,199 @@ export default function ContactsPage() {
             )}
 
             {/* Upgrade Modal */}
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                size="lg"
+                backdrop="blur"
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">
-                                Daily Contact View Limit Reached
+                            <ModalHeader className="flex flex-col gap-2 border-b border-white/10 pb-4 pt-6 px-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+                                        <Crown className="w-6 h-6 text-warning" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-white">Upgrade Required</h2>
+                                        <p className="text-sm text-gray-400 font-normal">Unlock unlimited access</p>
+                                    </div>
+                                </div>
                             </ModalHeader>
-                            <ModalBody>
-                                <p>
-                                    You've reached your daily limit of {DAILY_LIMIT} contact views.
-                                    Upgrade your plan to view unlimited contacts and access premium features.
-                                </p>
-                                <div className="bg-blue-50 p-4 rounded-lg">
-                                    <h4 className="font-semibold text-blue-900 mb-2">Premium Benefits:</h4>
-                                    <ul className="text-blue-800 text-sm space-y-1">
-                                        <li>• Unlimited daily contact views</li>
-                                        <li>• Export contact data</li>
-                                        <li>• Advanced filtering options</li>
-                                        <li>• Priority support</li>
-                                    </ul>
+                            <ModalBody className="gap-6 py-6 px-6">
+                                {/* Alert Box */}
+                                <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-xl">
+                                    <svg className="w-5 h-5 text-warning shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                    <div>
+                                        <p className="font-semibold text-sm text-white">Daily Limit Reached</p>
+                                        <p className="text-gray-400 text-sm mt-1">
+                                            You've viewed <span className="font-semibold text-white">{DAILY_LIMIT}</span> contacts today.
+                                            Upgrade to Premium for unlimited access.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Premium Features */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Premium Features</h4>
+                                        <Chip size="sm" color="warning" variant="flat">Popular</Chip>
+                                    </div>
+
+                                    <div className="grid gap-3">
+                                        <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl">
+                                            <div className="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white">Unlimited Contact Views</p>
+                                                <p className="text-xs text-gray-400">View as many contacts as you need</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl">
+                                            <div className="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white">Export to CSV/Excel</p>
+                                                <p className="text-xs text-gray-400">Download contact lists anytime</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl">
+                                            <div className="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white">Advanced Filtering</p>
+                                                <p className="text-xs text-gray-400">Search with powerful filters</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl">
+                                            <div className="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white">Priority Support</p>
+                                                <p className="text-xs text-gray-400">Get help when you need it</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                <Button color="default" variant="light" onPress={onClose}>
+                            <ModalFooter className="border-t border-white/10 px-6 pb-6 gap-2">
+                                <Button
+                                    variant="light"
+                                    onPress={onClose}
+                                >
                                     Maybe Later
                                 </Button>
                                 <Button
-                                    color="primary"
+                                    color="warning"
+                                    variant="shadow"
                                     onPress={() => {
-                                        alert('Upgrade functionality would be implemented here');
+                                        window.location.href = '/dashboard/upgrade';
                                         onClose();
                                     }}
+                                    startContent={<Crown className="w-4 h-4" />}
                                 >
-                                    Upgrade Now
+                                    Upgrade to Premium
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Contact Details Modal */}
+            <Modal
+                isOpen={isContactOpen}
+                onOpenChange={onContactOpenChange}
+                size="2xl"
+                backdrop="blur"
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 pb-4 pt-6 px-6 border-b border-white/10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                                        <Users className="w-6 h-6 text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-white">Contact Details</h2>
+                                        <p className="text-sm text-gray-400 font-normal">Employee information</p>
+                                    </div>
+                                </div>
+                            </ModalHeader>
+                            <ModalBody className="px-6 pb-6 pt-6">
+                                {selectedContact && (
+                                    <div className="space-y-4">
+                                        {/* Contact Name & Title */}
+                                        <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-14 h-14 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 text-lg font-bold">
+                                                    {selectedContact.first_name.charAt(0)}{selectedContact.last_name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-white">
+                                                        {selectedContact.first_name} {selectedContact.last_name}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-400">{selectedContact.title}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact Information */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                                <p className="text-xs text-gray-400 mb-1.5">Email</p>
+                                                <p className="text-sm font-medium text-white break-all">{selectedContact.email}</p>
+                                            </div>
+
+                                            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                                <p className="text-xs text-gray-400 mb-1.5">Phone</p>
+                                                <p className="text-sm font-medium text-white">{selectedContact.phone}</p>
+                                            </div>
+
+                                            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                                <p className="text-xs text-gray-400 mb-1.5">Department</p>
+                                                <Chip
+                                                    className="capitalize"
+                                                    color={departmentColorMap[selectedContact.department?.toLowerCase()] || "default"}
+                                                    size="sm"
+                                                    variant="flat"
+                                                >
+                                                    {capitalize(selectedContact.department || "N/A")}
+                                                </Chip>
+                                            </div>
+
+                                            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                                <p className="text-xs text-gray-400 mb-1.5">Agency ID</p>
+                                                <p className="text-sm font-medium text-white font-mono">{selectedContact.agency_id}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </ModalBody>
+                            <ModalFooter className="px-6 pb-6 border-t border-white/10 gap-2">
+                                <Button
+                                    variant="flat"
+                                    onPress={onClose}
+                                >
+                                    Close
                                 </Button>
                             </ModalFooter>
                         </>
