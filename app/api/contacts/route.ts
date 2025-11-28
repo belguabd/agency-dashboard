@@ -1,22 +1,11 @@
 import { NextResponse } from "next/server";
 import { parse } from "csv-parse/sync";
-import fs from "fs";
-import path from "path";
+import csvRaw from "@/data/contacts_contact_rows.csv?raw";
 
 export async function GET() {
   try {
-    // Path to the CSV file inside the public folder
-    const csvPath = path.join(
-      process.cwd(),
-      "public",
-      "contacts_contact_rows.csv"
-    );
-
-    // Read the CSV file
-    const fileContent = fs.readFileSync(csvPath, "utf8");
-
     // Parse CSV to JSON
-    const contacts = parse(fileContent, {
+    const contacts = parse(csvRaw, {
       columns: true, // Use the first row as column names
       skip_empty_lines: true, // Ignore empty lines
     });
