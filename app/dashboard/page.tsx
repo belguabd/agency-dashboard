@@ -11,8 +11,6 @@ import { Card, CardBody, CardHeader, Button, Progress, Chip, Divider } from "@he
 import { redirect } from "next/navigation";
 
 export default function DashboardPage() {
-
-    
     const { user } = useUser();
     const [totalAgencies, setTotalAgencies] = React.useState(0);
     const [totalContacts, setTotalContacts] = React.useState(0);
@@ -26,7 +24,6 @@ export default function DashboardPage() {
         const fetchData = async () => {
             setIsLoading(true);
 
-            // Fetch agencies and contacts
             const [agencies, contacts] = await Promise.all([
                 getAgencies(),
                 getContacts()
@@ -35,14 +32,12 @@ export default function DashboardPage() {
             setTotalAgencies(agencies.length);
             setTotalContacts(contacts.length);
 
-            // Check premium status
             const premiumStatus = localStorage.getItem('premiumStatus');
             if (premiumStatus) {
                 const { isPremium: premium } = JSON.parse(premiumStatus);
                 setIsPremium(premium);
             }
 
-            // Get daily view count from localStorage
             const today = new Date().toDateString();
             const storedData = localStorage.getItem('contactViewData');
 
@@ -64,10 +59,8 @@ export default function DashboardPage() {
     const remainingViews = isPremium ? '∞' : Math.max(0, DAILY_LIMIT - contactsViewedToday);
     const progressPercentage = isPremium ? 100 : (contactsViewedToday / DAILY_LIMIT) * 100;
 
-
     return (
         <div className="space-y-8">
-            {/* Header */}
             <div>
                 <h1 className="text-3xl font-bold flex items-center gap-3">
                     Welcome back, {user?.firstName ?? "User"}!
@@ -81,7 +74,6 @@ export default function DashboardPage() {
                 </p>
             </div>
 
-            {/* Premium Banner */}
             {isPremium && (
                 <Card className="bg-warning-50 dark:bg-warning-50/10 border-warning">
                     <CardBody>
@@ -108,9 +100,7 @@ export default function DashboardPage() {
                 </Card>
             )}
 
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Total Agencies */}
                 <Card shadow="sm">
                     <CardBody>
                         <div className="flex items-center justify-between mb-4">
@@ -135,7 +125,6 @@ export default function DashboardPage() {
                     </CardBody>
                 </Card>
 
-                {/* Total Contacts */}
                 <Card shadow="sm">
                     <CardBody>
                         <div className="flex items-center justify-between mb-4">
@@ -160,15 +149,11 @@ export default function DashboardPage() {
                     </CardBody>
                 </Card>
 
-                {/* Daily Usage */}
-                <Card
-                    className={isPremium ? 'border-success' : ''}
-                    shadow="sm"
-                >
+                <Card className={isPremium ? 'border-success' : ''} shadow="sm">
                     <CardBody>
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${isPremium ? 'bg-success-100 dark:bg-success-100/20' : 'bg-secondary-100 dark:bg-secondary-100/20'}`}>
-                                <Eye className={`w-6 h-6 ${isPremium ? 'text-success' : 'text-secondary'}`} />
+                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${isPremium ? 'bg-success-100 dark:bg-success-100/20' : 'bg-warning-100 dark:bg-warning-100/20'}`}>
+                                <Eye className={`w-6 h-6 ${isPremium ? 'text-success' : 'text-warning'}`} />
                             </div>
                             <Chip size="sm" variant="flat">Today</Chip>
                         </div>
@@ -182,7 +167,6 @@ export default function DashboardPage() {
                 </Card>
             </div>
 
-            {/* Daily Limit Progress or Premium Status */}
             {!isPremium ? (
                 <Card shadow="sm">
                     <CardBody>
@@ -209,7 +193,6 @@ export default function DashboardPage() {
                             </Link>
                         </div>
 
-                        {/* Progress Bar */}
                         <Progress
                             value={progressPercentage}
                             color="warning"
@@ -252,16 +235,11 @@ export default function DashboardPage() {
                 </Card>
             )}
 
-            {/* Quick Actions */}
             <div>
                 <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Link href="/dashboard/agencies">
-                        <Card
-                            isPressable
-                            isHoverable
-                            shadow="sm"
-                        >
+                        <Card isPressable isHoverable shadow="sm">
                             <CardBody>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-primary-100 dark:bg-primary-100/20 rounded-lg flex items-center justify-center">
@@ -277,11 +255,7 @@ export default function DashboardPage() {
                     </Link>
 
                     <Link href="/dashboard/contacts">
-                        <Card
-                            isPressable
-                            isHoverable
-                            shadow="sm"
-                        >
+                        <Card isPressable isHoverable shadow="sm">
                             <CardBody>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-success-100 dark:bg-success-100/20 rounded-lg flex items-center justify-center">

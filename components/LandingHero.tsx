@@ -11,21 +11,14 @@ import { ArrowRight, Shield } from "lucide-react";
 import Link from "next/link";
 
 import FloatingLines from "@/components/FloatingLines";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 
 export default function HeroSection() {
     return (
         <section className="relative pt-32 pb-24 px-6 overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 w-full h-full">
-                <FloatingLines
-                    enabledWaves={["top", "middle", "bottom"]}
-                    lineCount={[10, 15, 20]}
-                    lineDistance={[8, 6, 4]}
-                    bendRadius={5.0}
-                    bendStrength={-0.5}
-                    interactive={true}
-                    parallax={true}
-                />
+                <BackgroundRippleEffect />
 
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px] pointer-events-none" />
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black to-transparent pointer-events-none" />

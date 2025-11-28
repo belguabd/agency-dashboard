@@ -192,7 +192,7 @@ export default function ContactsPage() {
     const [isLoading, setIsLoading] = React.useState(true);
     const [viewedContacts, setViewedContacts] = React.useState<Set<string>>(new Set());
     const [isPremium, setIsPremium] = React.useState(false);
-    
+
 
     React.useEffect(() => {
         setIsMounted(true);
@@ -232,11 +232,20 @@ export default function ContactsPage() {
 
         fetchContacts();
     }, []);
+    useEffect(() => {
+        console.log("Real updated viewedContacts:", Array.from(viewedContacts));
+    }, [viewedContacts]);
 
     const handleContactView = React.useCallback((contact: Contact) => {
         setSelectedContact(contact);
 
         if (isPremium) {
+            
+            setViewedContacts(prev => {
+                const updated = new Set(prev);
+                updated.add(contact.id);
+                return updated;
+            });
             onContactOpen();
             return;
         }
@@ -247,33 +256,33 @@ export default function ContactsPage() {
             return;
         }
 
-        setDailyViewCount(prevCount => {
-            if (prevCount >= DAILY_LIMIT) {
-                onOpen();
-                return prevCount; // ❌ do not update
-            }
+        if (dailyViewCount >= DAILY_LIMIT) {
+            onOpen();
+            return;
+        }
 
-            const newCount = prevCount + 1;
+       
+        setViewedContacts(prev => {
+            const updated = new Set(prev);
+            updated.add(contact.id);
 
-            // update viewed ids + localStorage together
-            setViewedContacts(prevViewed => {
-                const updated = new Set(prevViewed);
-                updated.add(contact.id);
-
-                localStorage.setItem('contactViewData', JSON.stringify({
+            const newCount = updated.size;
+            setDailyViewCount(newCount);
+            localStorage.setItem(
+                'contactViewData',
+                JSON.stringify({
                     date: new Date().toDateString(),
                     count: newCount,
                     viewedIds: Array.from(updated),
-                }));
+                })
+            );
 
-                return updated;
-            });
-
-            onContactOpen();
-            return newCount;
+            return updated;
         });
 
-    }, [onContactOpen, onOpen, isPremium, viewedContacts]);
+        // Open contact details modal
+        onContactOpen();
+    }, [onContactOpen, onOpen, isPremium, viewedContacts, dailyViewCount]);
 
 
 

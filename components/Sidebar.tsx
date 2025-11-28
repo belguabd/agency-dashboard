@@ -44,12 +44,13 @@ export default function Sidebar() {
                 {/* Logo + App name */}
                 <Link href="/" className="flex items-center gap-3 mb-10 group">
                     <div className="relative w-11 h-11 rounded-xl bg-linear-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center group-hover:border-white/20 group-hover:from-white/15 group-hover:to-white/10 transition-all duration-300 shadow-lg shadow-white/5">
-                        <span className="text-white font-bold text-xl group-hover:scale-110 transition-transform duration-200">A</span>
+                        {/* use Building2 icon as logo */}
+                        <Building2 className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-200" aria-hidden="true" />
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
                             <h1 className="text-white font-bold text-lg group-hover:text-gray-100 transition-colors">Agency</h1>
-                            {isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
+                            {isPremium && <Crown className="w-4 h-4 text-white" />}
                         </div>
                         <p className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">
                             {isPremium ? 'Premium' : 'Dashboard'}
@@ -87,15 +88,13 @@ export default function Sidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`group flex items-center gap-3 p-2 rounded-xl transition-all duration-200 ${isActive
-                                    ? "bg-white/[0.07] border border-white/20"
-                                    : "bg-white/5 border border-white/10 hover:bg-white/[0.07] hover:border-white/20"
-                                    }`}
+                                className="group flex items-center gap-1 p-2 rounded-md transition-colors duration-200"
                             >
-                                <div className={`w-9 h-9 ${isActive ? colors.activeIconBg : colors.iconBg} rounded-lg flex items-center justify-center shrink-0 transition-all duration-200`}>
-                                    <Icon className={`w-5 h-5 ${colors.iconColor}`} />
+                                {/* icon container remains transparent */}
+                                <div className="w-9 h-9 bg-transparent rounded-lg flex items-center justify-center shrink-0">
+                                    <Icon className="w-5 h-5 text-white" aria-hidden="true" />
                                 </div>
-                                <span className={`text-sm ${isActive ? "text-white" : "text-gray-400 group-hover:text-white"} transition-colors duration-200`}>
+                                <span className={`text-sm ${isActive ? "text-white font-semibold" : "text-gray-400 group-hover:text-white"} transition-colors duration-200`}>
                                     {item.label}
                                 </span>
                             </Link>
@@ -106,15 +105,15 @@ export default function Sidebar() {
                 {/* Upgrade/Premium Card */}
                 <div className="mt-auto pt-6">
                     {isPremium ? (
-                        <div className="group relative p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/30 rounded-xl overflow-hidden">
+                        <div className="group relative p-4 bg-linear-to-br from-green-500/10 to-green-500/5 border border-green-500/30 rounded-xl overflow-hidden">
                             <div className="relative flex items-start gap-3 mb-2">
                                 <div className="w-9 h-9 bg-green-500/20 rounded-xl flex items-center justify-center shrink-0">
-                                    <Check className="w-5 h-5 text-green-400" />
+                                    <Check className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
                                         Premium Active
-                                        <Crown className="w-3.5 h-3.5 text-yellow-400" />
+                                        <Crown className="w-3.5 h-3.5 text-white" />
                                     </h3>
                                     <p className="text-xs text-gray-400 leading-relaxed">
                                         Unlimited access enabled
@@ -132,12 +131,12 @@ export default function Sidebar() {
                             <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <div className="relative flex items-start gap-3 mb-3">
                                 <div className="w-9 h-9 bg-yellow-500/15 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-yellow-500/20 transition-all duration-200 shadow-sm">
-                                    <Crown className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform duration-200" />
+                                    <Crown className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-200" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
                                         Upgrade to Pro
-                                        <Sparkles className="w-3.5 h-3.5 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                        <Sparkles className="w-3.5 h-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                     </h3>
                                     <p className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-400 transition-colors">
                                         Unlock unlimited contacts
@@ -188,7 +187,7 @@ export default function Sidebar() {
                         </div>
                         <SignOutButton>
                             <button className="p-2 rounded-lg hover:bg-white/10 active:scale-95 transition-all duration-200 group/btn">
-                                <LogOut className="w-4 h-4 text-gray-500 group-hover/btn:text-white transition-colors" />
+                                <LogOut className="w-4 h-4 text-white transition-colors" />
                             </button>
                         </SignOutButton>
                     </div>
